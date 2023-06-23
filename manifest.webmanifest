@@ -1,0 +1,33 @@
+{
+  "background_color": "#0164b4",
+  "description": "",
+  "display": "standalone",
+  "id": "/",
+  "icons": [
+    {
+      "src": "images/logos/logo-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "images/logos/logo-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "name": "Pokémon Type ELO",
+  "screenshots" : [
+    {
+      "src": "images/screenshots/screenshot1.webp",
+      "sizes": "3360x1670",
+      "type": "image/webp",
+      "platform": "wide",
+      "label": "Homescreen of Pokémon Type ELO"
+    }
+  ],
+  "short_name": "Pokémon Type ELO",
+  "start_url": "/",
+  "theme_color": "#0164b4"
+}
