@@ -1,13 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512">
-    <g transform="matrix(3.36871 0 0 3.38302 -67.439 251.31)">
-        <rect fill="#0164b4" rx="10.019" y="-73.089" x="21.687" height="148.064" width="148.276"/>
-        <path fill="#000" d="M23.341 1.323H167.96v19.334H23.341V1.323z" fill-opacity="null"/>
-        <path fill="#0164b4" d="M23.341-18.555H167.96V.849H23.341v-19.404z" fill-opacity="null"/>
-        <path fill="#000" d="M170.343 19.787 95.65 41.022 20.957 19.787h149.386z"/>
-        <path fill="#0164b4" d="M170.343.611 95.65 21.847 20.957.61h149.386v.001z"/>
-        <path fill="#000" d="M170.343-18.643 95.65 2.592 20.957-18.643h149.386z"/>
-        <path fill="#000" d="M21.687-36.685h148.276v19.008H21.687v-19.008z" fill-opacity="null"/>
-        <rect fill="#000" rx="10.019" y="-73.089" x="21.687" height="50.022" width="148.276"/>
-        <rect fill="none" stroke-width="4" stroke="#000" rx="10.019" y="-73.089" x="21.687" height="148.064" width="148.276"/>
-    </g>
+  <circle cx="256" cy="256" r="256" fill="#fff"/>
+  <path d="M8 192 Q64 8 256 8 Q448 8 504 192 L256 256 Z" fill="#eb382c"/>
+  <path d="M24 164 L256 224 L486 164 L504 224 L256 288 L8 224 Z" fill="#000"/>
+  <path d="M8 256 L256 320 L504 256 L504 320 L256 384 L8 320 Z" fill="#000"/>
+  <circle cx="256" cy="256" r="248" fill="none" stroke="#000" stroke-width="16"/>
 </svg>
