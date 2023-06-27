@@ -16,6 +16,25 @@
 	--color-primary-8: oklch(20% 0.059 var(--hue));
 	--color-primary-9: oklch(10% 0.029 var(--hue));
 
+	--color-bug: #92BC2C;
+	--color-dark: #595761;
+	--color-dragon: #0C69C8;
+	--color-electric: #F2D94E;
+	--color-fire: #FBA54C;
+	--color-fairy: #EE90E6;
+	--color-fighting: #D3425F;
+	--color-flying: #A1BBEC;
+	--color-ghost: #5F6DBC;
+	--color-grass: #5FBD58;
+	--color-ground: #DA7C4D;
+	--color-ice: #75D0C1;
+	--color-normal: #A0A29F;
+	--color-poison: #B763CF;
+	--color-psychic: #FA8581;
+	--color-rock: #C9BB8A;
+	--color-steel: #5695A3;
+	--color-water: #539DDF;
+
 	/*
 		Primary Color
 	*/

@@ -1,4 +1,4 @@
-const version = "1.01";
+const version = "1.02";
 const cacheName = "jb-${version}";
 
 self.addEventListener("install", e => {
@@ -18,6 +18,24 @@ self.addEventListener("install", e => {
 				"/images/logos/logo-192.svg",
 				"/images/logos/logo-512.png",
 				"/images/logos/logo-512.svg",
+				"/images/icons/.svg",
+				"/images/icons/.svg",
+				"/images/icons/.svg",
+				"/images/icons/.svg",
+				"/images/icons/.svg",
+				"/images/icons/.svg",
+				"/images/icons/.svg",
+				"/images/icons/.svg",
+				"/images/icons/.svg",
+				"/images/icons/.svg",
+				"/images/icons/.svg",
+				"/images/icons/.svg",
+				"/images/icons/.svg",
+				"/images/icons/.svg",
+				"/images/icons/.svg",
+				"/images/icons/.svg",
+				"/images/icons/.svg",
+				"/images/icons/.svg",
 				// "/images/screenshots/screenshot1.webp",
 				"/scripts/main.js",
 				"/styles/1-settings/color.css",
@@ -25,7 +43,8 @@ self.addEventListener("install", e => {
 				"/styles/3-generic/reset.css",
 				"/styles/4-elements/body.css",
 				"/styles/6-components/button.css",
-				"/styles/6-components/footer.css"
+				"/styles/6-components/footer.css",
+				"/styles/6-components/header.css"
 				
 			])
 			.then(() => self.skipWaiting());

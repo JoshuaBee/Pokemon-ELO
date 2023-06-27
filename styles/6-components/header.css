@@ -1,0 +1,117 @@
+/*--------------------------------//
+//                                //
+//             Header             //
+//                                //
+//--------------------------------*/
+header {
+	height: 100vh;
+	position: relative;
+	width: 100vw;
+}
+
+h1 {
+	font-size: 3rem;
+	left: 50%;
+	position: absolute;
+	top: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.icon {
+    background-color: var(--color-icon);
+    box-shadow: 0 0 20px var(--color-icon);
+    height: 100px;
+	position: absolute;
+    width: 100px;
+}
+
+.icon img {
+    height: 60%;
+    width: 60%;
+    margin: 20%;
+}
+
+.icon[data-animate="true"] {
+    animation: collide 0.5s normal forwards;
+}
+
+@keyframes collide {
+    from {
+        box-shadow: 0 0 20px var(--color-icon);
+    }
+    to {
+        box-shadow: 0 0 1000px var(--color-icon);
+    }
+  }
+
+.bug {
+    --color-icon: var(--color-bug);
+}
+
+.dark {
+    --color-icon: var(--color-dark);
+}
+
+.dragon {
+    --color-icon: var(--color-dragon);
+}
+
+.electric {
+    --color-icon: var(--color-electric);
+}
+
+.fire {
+    --color-icon: var(--color-fire);
+}
+
+.fairy {
+    --color-icon: var(--color-fairy);
+}
+
+.fighting {
+    --color-icon: var(--color-fighting);
+}
+
+.flying {
+    --color-icon: var(--color-flying);
+}
+
+.ghost {
+    --color-icon: var(--color-ghost);
+}
+
+.grass {
+    --color-icon: var(--color-grass);
+}
+
+.ground {
+    --color-icon: var(--color-ground);
+}
+
+.ice {
+    --color-icon: var(--color-ice);
+}
+
+.normal {
+    --color-icon: var(--color-normal);
+}
+
+.poison {
+    --color-icon: var(--color-poison);
+}
+
+.psychic {
+    --color-icon: var(--color-psychic);
+}
+
+.rock {
+    --color-icon: var(--color-rock);
+}
+
+.steel {
+    --color-icon: var(--color-steel);
+}
+
+.water {
+    --color-icon: var(--color-water);
+}
