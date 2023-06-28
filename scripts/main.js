@@ -1,3 +1,14 @@
+// Enums
+
+const overlap = {
+	BOTTOM: 'bottom',
+	LEFT: 'left',
+	NONE: 'none',
+	RIGHT: 'right',
+	TOP: 'top',
+}
+Object.freeze(overlap);
+
 const types = {
 	BUG: 'bug',
 	DARK: 'dark',
@@ -20,6 +31,54 @@ const types = {
 }
 Object.freeze(types);
 
+// Classes
+
+class Icon {
+	constructor(element) {
+		this.element = element;
+		this.horizontalVelocity = 0;
+		this.left = 0;
+		this.top = 0;
+		this.verticalVelocity = 0;
+
+		this.getRandomIconPosition();
+		this.getRandomIconVelocity();
+	}
+
+	getRandomIconPosition() {
+		this.top = (Math.random() * (window.innerHeight - 100 - 15));
+		this.left = (Math.random() * (window.innerWidth - 100 - 15));
+		this.element.style.transform = `translate(${this.left}px, ${this.top}px)`;
+	}
+
+	getRandomIconVelocity() {
+		let horizontalVelocity = 2 * Math.random() - 1;
+		let verticalVelocity = 2 * Math.random() - 1;
+
+		// Normalise
+		const norm = Math.sqrt(horizontalVelocity**2 + verticalVelocity**2);
+		horizontalVelocity /= norm;
+		verticalVelocity /= norm;
+
+		this.horizontalVelocity = horizontalVelocity;
+		this.verticalVelocity = verticalVelocity;
+	}
+
+	updatePosition() {
+		this.left += this.horizontalVelocity;
+		this.top += this.verticalVelocity;
+		this.element.style.transform = `translate(${this.left}px, ${this.top}px)`;
+	}
+
+	animate() {
+		this.element.dataset.animate = 'true';
+
+		setTimeout(() => {
+			this.element.dataset.animate = 'false';
+		}, 500);
+	}
+}
+
 // Elements
 const $header = document.querySelector('header');
 const $title = document.querySelector('h1');
@@ -41,14 +100,10 @@ function loadPokemonIcons() {
 		// Loop over types...
 		for (const [key, value] of Object.entries(types)) {
 			const $iconContainer = document.createElement('div');
-			const icon = {
-				element: $iconContainer,
-			};
+			const icon = new Icon($iconContainer);
 
 			$iconContainer.classList.add('icon');
 			$iconContainer.classList.add(value);
-			getRandomIconPosition(icon);
-			getRandomIconVelocity(icon);
 			$header.appendChild($iconContainer);
 
 			icons.push(icon);
@@ -63,25 +118,6 @@ function loadPokemonIcons() {
 	}
 }
 
-function getRandomIconPosition(icon) {
-	icon.top = (Math.random() * (window.innerHeight - 100 - 15));
-	icon.left = (Math.random() * (window.innerWidth - 100 - 15));
-	icon.element.style.transform = `translate(${icon.left}px, ${icon.top}px)`;
-}
-
-function getRandomIconVelocity(icon) {
-	let horizontalVelocity = 2 * Math.random() - 1;
-	let verticalVelocity = 2 * Math.random() - 1;
-
-	// Normalise
-	const norm = Math.sqrt(horizontalVelocity**2 + verticalVelocity**2);
-	horizontalVelocity /= norm;
-	verticalVelocity /= norm;
-
-	icon.horizontalVelocity = horizontalVelocity;
-	icon.verticalVelocity = verticalVelocity;
-}
-
 function resolveCollisions() {
 	const els = [{ element: $title }, ...icons];
 	
@@ -94,7 +130,7 @@ function resolveCollisions() {
 			// Check if any elements overlap...
 			if (elementsOverlap(el1.element, el2.element)) {
 				// If so, move one icon and check for further collisions.
-				getRandomIconPosition(el2);
+				el2.getRandomIconPosition();
 				resolveCollisions();
 			}
 		}
@@ -131,21 +167,17 @@ function elementsOverlapOrientation($el1, $el2) {
     var height = (rect1.height + rect2.height) / 2;
     var crossWidth = width * dy;
     var crossHeight = height * dx;
-    var collision = 'none';
+    var collision = overlap.NONE;
 
     if (Math.abs(dx) <= width && Math.abs(dy) <= height) {
         if (crossWidth > crossHeight) {
-            collision = crossWidth > -1 * crossHeight ? 'bottom' : 'left';
+            collision = crossWidth > -1 * crossHeight ? overlap.BOTTOM : overlap.LEFT;
         } else {
-            collision = crossWidth > -1 * crossHeight ? 'right' : 'top';
+            collision = crossWidth > -1 * crossHeight ? overlap.RIGHT : overlap.TOP;
         }
     }
 
     return collision;
-}
-
-function getRandomInt(max) {
-	return Math.floor(Math.random() * max);
 }
 
 function startIcons() {
@@ -158,15 +190,12 @@ function generateNextFrame() {
 	// Update Icon Positions...
 	for (let i = 0; i < icons.length; i++) {
 		const icon = icons[i];
-		const $icon = icon.element;
 		let edgeHit = false;
 
-		icon.left += icon.horizontalVelocity;
-		icon.top += icon.verticalVelocity;
-		$icon.style.transform = `translate(${icon.left}px, ${icon.top}px)`;
+		icon.updatePosition();
 
 		// If the icon hits an edge, make it bounce...
-		const rect = $icon.getBoundingClientRect();
+		const rect = icon.element.getBoundingClientRect();
 
 		// Check if a vertical edge is hit...
 		if (rect.left < 0 || rect.left + rect.width > headerRect.width) {
@@ -185,33 +214,29 @@ function generateNextFrame() {
 		// If an edge was hit...
 		if (edgeHit) {
 			// Update the icon position.
-			icon.left += icon.horizontalVelocity;
-			icon.top += icon.verticalVelocity;
-			$icon.style.transform = `translate(${icon.left}px, ${icon.top}px)`;
+			icon.updatePosition();
 		}
 
 		// Check if the icon has hit the title...
 		const titleCollision = elementsOverlapOrientation($title, icon.element);
-		if (titleCollision !== 'none') {
+		if (titleCollision !== overlap.NONE) {
 			// If so, we need to update the velocities of the icon
 			switch (titleCollision) {
-				case 'left':
+				case overlap.LEFT:
 					icon.horizontalVelocity = Math.abs(icon.horizontalVelocity);
 					break;
-				case 'right':
+				case overlap.RIGHT:
 					icon.horizontalVelocity = -1 * Math.abs(icon.horizontalVelocity);
 					break;
-				case 'top':
+				case overlap.TOP:
 					icon.verticalVelocity = Math.abs(icon.verticalVelocity);
 					break;
-				case 'bottom':
+				case overlap.BOTTOM:
 					icon.verticalVelocity = -1 * Math.abs(icon.verticalVelocity);
 					break;
 			}
 
-			icon.left += icon.horizontalVelocity;
-			icon.top += icon.verticalVelocity;
-			$icon.style.transform = `translate(${icon.left}px, ${icon.top}px)`;
+			icon.updatePosition();
 		}
 
 		// Check if the icon has hit another icon...
@@ -220,47 +245,31 @@ function generateNextFrame() {
 
 			// Check if any elements overlap...
 			const collision = elementsOverlapOrientation(icon.element, icon2.element);
-			if (collision !== 'none') {
-				if (collision === 'left' || collision === 'right') {
-					icon.horizontalVelocity *= -1;
-					icon2.horizontalVelocity *= -1;
-				} else if (collision === 'top' || collision === 'bottom') {
-					icon.verticalVelocity *= -1;
-					icon2.verticalVelocity *= -1;
-				}
+			if (collision !== overlap.NONE) {
 				switch (collision) {
-					case 'left':
+					case overlap.LEFT:
 						icon.horizontalVelocity = -1 * Math.abs(icon.horizontalVelocity);
 						icon2.horizontalVelocity = Math.abs(icon2.horizontalVelocity);
 						break;
-					case 'right':
+					case overlap.RIGHT:
 						icon.horizontalVelocity = Math.abs(icon.horizontalVelocity);
 						icon2.horizontalVelocity = -1 * Math.abs(icon2.horizontalVelocity);
 						break;
-					case 'top':
+					case overlap.TOP:
 						icon.verticalVelocity = -1 * Math.abs(icon.verticalVelocity);
 						icon2.verticalVelocity = Math.abs(icon2.verticalVelocity);
 						break;
-					case 'bottom':
+					case overlap.BOTTOM:
 						icon.verticalVelocity = Math.abs(icon.verticalVelocity);
 						icon2.verticalVelocity = -1 * Math.abs(icon2.verticalVelocity);
 						break;
 				}
 
-				icon.left += icon.horizontalVelocity;
-				icon.top += icon.verticalVelocity;
-				$icon.style.transform = `translate(${icon.left}px, ${icon.top}px)`;
-				$icon.dataset.animate = 'true';
+				icon.updatePosition();
+				icon.animate();
 
-				icon2.left += icon2.horizontalVelocity;
-				icon2.top += icon2.verticalVelocity;
-				icon2.element.style.transform = `translate(${icon2.left}px, ${icon2.top}px)`;
-				icon2.element.dataset.animate = 'true';
-
-				setTimeout(() => {
-					$icon.dataset.animate = 'false';
-					icon2.element.dataset.animate = 'false';
-				}, 500);
+				icon2.updatePosition();
+				icon2.animate();
 			}
 		}
 	}
