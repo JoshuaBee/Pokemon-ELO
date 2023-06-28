@@ -64,8 +64,8 @@ function loadPokemonIcons() {
 }
 
 function getRandomIconPosition(icon) {
-	icon.top = (Math.random() * (window.innerHeight - 100));
-	icon.left = (Math.random() * (window.innerWidth - 100));
+	icon.top = (Math.random() * (window.innerHeight - 100 - 15));
+	icon.left = (Math.random() * (window.innerWidth - 100 - 15));
 	icon.element.style.transform = `translate(${icon.left}px, ${icon.top}px)`;
 }
 
@@ -255,11 +255,11 @@ function generateNextFrame() {
 				icon2.left += icon2.horizontalVelocity;
 				icon2.top += icon2.verticalVelocity;
 				icon2.element.style.transform = `translate(${icon2.left}px, ${icon2.top}px)`;
-				icon2.element.animate = 'true';
+				icon2.element.dataset.animate = 'true';
 
 				setTimeout(() => {
 					$icon.dataset.animate = 'false';
-					icon2.element.animate = 'false';
+					icon2.element.dataset.animate = 'false';
 				}, 500);
 			}
 		}

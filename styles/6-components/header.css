@@ -4,114 +4,124 @@
 //                                //
 //--------------------------------*/
 header {
-	height: 100vh;
-	position: relative;
-	width: 100vw;
+  height: 100vh;
+  max-width: 100%;
+  position: relative;
+  width: 100vw;
 }
 
 h1 {
-	font-size: 3rem;
-	left: 50%;
-	position: absolute;
-	top: 50%;
-	transform: translate(-50%, -50%);
+  font-size: 3rem;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .icon {
-    background-color: var(--color-icon);
-    box-shadow: 0 0 20px var(--color-icon);
-    height: 100px;
-	position: absolute;
-    width: 100px;
+  background-color: var(--color-icon);
+  height: 100px;
+  position: absolute;
+  width: 100px;
+}
+
+.icon::after {
+  box-shadow: 0 0 20px var(--color-icon);
+  content: "";
+  height: 100%;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+}
+
+.icon[data-animate="true"]::after {
+  animation: collide 0.5s normal forwards;
 }
 
 .icon img {
-    height: 60%;
-    width: 60%;
-    margin: 20%;
-}
-
-.icon[data-animate="true"] {
-    animation: collide 0.5s normal forwards;
+  height: 60%;
+  width: 60%;
+  margin: 20%;
 }
 
 @keyframes collide {
-    from {
-        box-shadow: 0 0 20px var(--color-icon);
-    }
-    to {
-        box-shadow: 0 0 1000px var(--color-icon);
-    }
+  from {
+    opacity: 1;
   }
+  to {
+    opacity: 0;
+  }
+}
 
 .bug {
-    --color-icon: var(--color-bug);
+  --color-icon: var(--color-bug);
 }
 
 .dark {
-    --color-icon: var(--color-dark);
+  --color-icon: var(--color-dark);
 }
 
 .dragon {
-    --color-icon: var(--color-dragon);
+  --color-icon: var(--color-dragon);
 }
 
 .electric {
-    --color-icon: var(--color-electric);
+  --color-icon: var(--color-electric);
 }
 
 .fire {
-    --color-icon: var(--color-fire);
+  --color-icon: var(--color-fire);
 }
 
 .fairy {
-    --color-icon: var(--color-fairy);
+  --color-icon: var(--color-fairy);
 }
 
 .fighting {
-    --color-icon: var(--color-fighting);
+  --color-icon: var(--color-fighting);
 }
 
 .flying {
-    --color-icon: var(--color-flying);
+  --color-icon: var(--color-flying);
 }
 
 .ghost {
-    --color-icon: var(--color-ghost);
+  --color-icon: var(--color-ghost);
 }
 
 .grass {
-    --color-icon: var(--color-grass);
+  --color-icon: var(--color-grass);
 }
 
 .ground {
-    --color-icon: var(--color-ground);
+  --color-icon: var(--color-ground);
 }
 
 .ice {
-    --color-icon: var(--color-ice);
+  --color-icon: var(--color-ice);
 }
 
 .normal {
-    --color-icon: var(--color-normal);
+  --color-icon: var(--color-normal);
 }
 
 .poison {
-    --color-icon: var(--color-poison);
+  --color-icon: var(--color-poison);
 }
 
 .psychic {
-    --color-icon: var(--color-psychic);
+  --color-icon: var(--color-psychic);
 }
 
 .rock {
-    --color-icon: var(--color-rock);
+  --color-icon: var(--color-rock);
 }
 
 .steel {
-    --color-icon: var(--color-steel);
+  --color-icon: var(--color-steel);
 }
 
 .water {
-    --color-icon: var(--color-water);
+  --color-icon: var(--color-water);
 }
