@@ -34,21 +34,38 @@ Object.freeze(types);
 // Classes
 
 class Icon {
-	constructor(element) {
-		this.element = element;
+	constructor(type) {
+		this.bottom = 0;
+		this.element;
 		this.horizontalVelocity = 0;
 		this.left = 0;
-		this.top = 0;
+		this.scale = 1;
+		this.type = type;
 		this.verticalVelocity = 0;
+
+		this.init();
+	}
+
+	init() {
+		this.element = document.createElement('div');
+
+		this.element.classList.add('icon');
+		this.element.classList.add(this.type);
+		$header.appendChild(this.element);
+
+		const $icon = document.createElement('img');
+		$icon.src = `images/icons/${this.type}.svg`;
+		$icon.alt = `${this.type} icon`;
+		this.element.appendChild($icon);
 
 		this.getRandomIconPosition();
 		this.getRandomIconVelocity();
 	}
 
 	getRandomIconPosition() {
-		this.top = (Math.random() * (window.innerHeight - 100 - 15));
+		this.bottom = (Math.random() * (window.innerHeight - 100));
 		this.left = (Math.random() * (window.innerWidth - 100 - 15));
-		this.element.style.transform = `translate(${this.left}px, ${this.top}px)`;
+		this.element.style.transform = `translate(${this.left}px, ${window.innerHeight - 100 - this.bottom}px) scale(${this.scale})`;
 	}
 
 	getRandomIconVelocity() {
@@ -65,9 +82,13 @@ class Icon {
 	}
 
 	updatePosition() {
+		this.bottom += this.verticalVelocity;
 		this.left += this.horizontalVelocity;
-		this.top += this.verticalVelocity;
-		this.element.style.transform = `translate(${this.left}px, ${this.top}px)`;
+		this.render();
+	}
+
+	render() {
+		this.element.style.transform = `translate(${this.left}px, ${window.innerHeight - 100 - this.bottom}px) scale(${this.scale})`;
 	}
 
 	animate() {
@@ -91,27 +112,16 @@ let animationFrame;
 var deferredPrompt;
 
 document.addEventListener('DOMContentLoaded', () => {
-	loadPokemonIcons();
+	loadIcons();
 	startIcons();
 });
 
-function loadPokemonIcons() {
+function loadIcons() {
 	if ($header) {
 		// Loop over types...
 		for (const [key, value] of Object.entries(types)) {
-			const $iconContainer = document.createElement('div');
-			const icon = new Icon($iconContainer);
-
-			$iconContainer.classList.add('icon');
-			$iconContainer.classList.add(value);
-			$header.appendChild($iconContainer);
-
+			const icon = new Icon(value);
 			icons.push(icon);
-
-			const $icon = document.createElement('img');
-			$icon.src = `images/icons/${value}.svg`;
-			$icon.alt = `${value} icon`;
-			$iconContainer.appendChild($icon);
 		}
 		
 		resolveCollisions();
@@ -119,65 +129,111 @@ function loadPokemonIcons() {
 }
 
 function resolveCollisions() {
-	const els = [{ element: $title }, ...icons];
+	let overlap = false;
 	
-	for (let i = 0; i < els.length; i++) {
-		const el1 = els[i];
+	for (let i = 0; i < icons.length; i++) {
+		const icon1 = icons[i];
+		
+		// Check if any icons overlap the title...
+		if (circlesOverlap(icon1.element, $title)) {
+			// If so, move the icon and check for further collisions.
+			icon1.getRandomIconPosition();
+			overlap = true;
+			break;
+		}
 
-		for (let j = i + 1; j < els.length; j++) {
-			const el2 = els[j];
+		for (let j = i + 1; j < icons.length; j++) {
+			const icon2 = icons[j];
 
 			// Check if any elements overlap...
-			if (elementsOverlap(el1.element, el2.element)) {
+			if (circlesOverlap(icon1.element, icon2.element)) {
 				// If so, move one icon and check for further collisions.
-				el2.getRandomIconPosition();
-				resolveCollisions();
+				icon2.getRandomIconPosition();
+				overlap = true;
+				break;
 			}
 		}
+
+		if (overlap) {
+			break;
+		}
+	}
+
+	if (overlap) {
+		for (let i = 0; i < icons.length; i++) {
+			const icon = icons[i];
+			icon.scale -= 0.01;
+			icon.render();
+		}
+
+		resolveCollisions();
 	}
 }
 
 /**
- * @param {HTMLElement} $el1
- * @param {HTMLElement} $el2
+ * @param {HTMLElement} $circle1
+ * @param {HTMLElement} $circle2
  */
-function elementsOverlap($el1, $el2) {
-	const rect1 = $el1.getBoundingClientRect();
-	const rect2 = $el2.getBoundingClientRect();
-  
-	return !(
-		rect1.top > rect2.bottom ||
-		rect1.right < rect2.left ||
-		rect1.bottom < rect2.top ||
-		rect1.left > rect2.right
-	);
+function circlesOverlap($circle1, $circle2) {
+	const rect1 = $circle1.getBoundingClientRect();
+	const r1 = rect1.width / 2;
+	const centerX1 = rect1.x + r1;
+	const centerY1 = rect1.y + r1;
+
+	const rect2 = $circle2.getBoundingClientRect();
+	const r2 = rect2.width / 2;
+	const centerX2 = rect2.x + r2;
+	const centerY2 = rect2.y + r2;
+
+	const dx = centerX2 - centerX1;
+	const dy = (centerY2 - centerY1) * -1;
+
+	const d = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+	
+	return d < r1 + r2;
 }
 
 /**
- * @param {HTMLElement} $el1
- * @param {HTMLElement} $el2
+ * @param {HTMLElement} $circle1
+ * @param {HTMLElement} $circle2
  */
-function elementsOverlapOrientation($el1, $el2) {
-	const rect1 = $el1.getBoundingClientRect();
-	const rect2 = $el2.getBoundingClientRect();
+function circlesOverlapAngle($circle1, $circle2) {
+	const rect1 = $circle1.getBoundingClientRect();
+	const r1 = rect1.width / 2;
+	const centerX1 = rect1.x + r1;
+	const centerY1 = rect1.y + r1;
 
-	var dx = (rect1.x + rect1.width / 2) - (rect2.x + rect2.width / 2);
-    var dy = (rect1.y + rect1.height / 2 ) - (rect2.y + rect2.height / 2);
-    var width = (rect1.width + rect2.width) / 2;
-    var height = (rect1.height + rect2.height) / 2;
-    var crossWidth = width * dy;
-    var crossHeight = height * dx;
-    var collision = overlap.NONE;
+	const rect2 = $circle2.getBoundingClientRect();
+	const r2 = rect2.width / 2;
+	const centerX2 = rect2.x + r2;
+	const centerY2 = rect2.y + r2;
 
-    if (Math.abs(dx) <= width && Math.abs(dy) <= height) {
-        if (crossWidth > crossHeight) {
-            collision = crossWidth > -1 * crossHeight ? overlap.BOTTOM : overlap.LEFT;
-        } else {
-            collision = crossWidth > -1 * crossHeight ? overlap.RIGHT : overlap.TOP;
-        }
-    }
+	const dx = centerX2 - centerX1;
+	const dy = (centerY2 - centerY1) * -1;
+	
+	return getAngle(dx, dy);
+}
 
-    return collision;
+/**
+ * @param {number} dx
+ * @param {number} dy
+ */
+function getAngle(dx, dy) {
+	if (Math.abs(dx) < 1) {
+		if (dy < 0) {
+			return 90;
+		} else {
+			return 270;
+		}
+	}
+	let theta = Math.atan2(dy, dx); // range (-PI, PI]
+	theta *= 180 / Math.PI;// range (-180, 180]
+
+	if (theta < 0) {
+		theta += 360; // range [0, 360)
+	}
+
+	return theta;
 }
 
 function startIcons() {
@@ -189,54 +245,52 @@ function generateNextFrame() {
 
 	// Update Icon Positions...
 	for (let i = 0; i < icons.length; i++) {
-		const icon = icons[i];
+		const icon1 = icons[i];
 		let edgeHit = false;
 
-		icon.updatePosition();
+		icon1.updatePosition();
 
 		// If the icon hits an edge, make it bounce...
-		const rect = icon.element.getBoundingClientRect();
+		const rect = icon1.element.getBoundingClientRect();
 
 		// Check if a vertical edge is hit...
 		if (rect.left < 0 || rect.left + rect.width > headerRect.width) {
-			icon.left -= icon.horizontalVelocity;
-			icon.horizontalVelocity *= -1;
+			icon1.left -= icon1.horizontalVelocity;
+			icon1.horizontalVelocity *= -1;
 			edgeHit = true;
 		}
 
 		// Check if a horizontal edge is hit...
 		if (rect.top < 0 || rect.top + rect.height > headerRect.height) {
-			icon.top -= icon.verticalVelocity;
-			icon.verticalVelocity *= -1;
+			icon1.bottom -= icon1.verticalVelocity;
+			icon1.verticalVelocity *= -1;
 			edgeHit = true;
 		}
 
 		// If an edge was hit...
 		if (edgeHit) {
 			// Update the icon position.
-			icon.updatePosition();
+			icon1.updatePosition();
 		}
 
 		// Check if the icon has hit the title...
-		const titleCollision = elementsOverlapOrientation($title, icon.element);
-		if (titleCollision !== overlap.NONE) {
+		const overlap = circlesOverlap(icon1.element, $title);
+		if (overlap) {
 			// If so, we need to update the velocities of the icon
-			switch (titleCollision) {
-				case overlap.LEFT:
-					icon.horizontalVelocity = Math.abs(icon.horizontalVelocity);
-					break;
-				case overlap.RIGHT:
-					icon.horizontalVelocity = -1 * Math.abs(icon.horizontalVelocity);
-					break;
-				case overlap.TOP:
-					icon.verticalVelocity = Math.abs(icon.verticalVelocity);
-					break;
-				case overlap.BOTTOM:
-					icon.verticalVelocity = -1 * Math.abs(icon.verticalVelocity);
-					break;
-			}
+			// https://en.wikipedia.org/wiki/Elastic_collision#Two-dimensional_collision_with_two_moving_objects
+			const angle = circlesOverlapAngle(icon1.element, $title);
+			
+			const d = getAngle(100 * icon1.horizontalVelocity, 100 * icon1.verticalVelocity);
+			const o = 180 + (2 * angle) - d;
+			
+			const v = Math.sqrt(Math.pow(icon1.horizontalVelocity, 2) + Math.pow(icon1.verticalVelocity, 2));
+			const v1x = Math.cos(Math.PI * (o / 180));
+			const v1y = Math.sin(Math.PI * (o / 180));
+			const v1Norm = Math.sqrt(Math.pow(v1x, 2) + Math.pow(v1y, 2));
 
-			icon.updatePosition();
+			icon1.horizontalVelocity = v * v1x / v1Norm;
+			icon1.verticalVelocity = v * v1y / v1Norm;
+			icon1.updatePosition();
 		}
 
 		// Check if the icon has hit another icon...
@@ -244,30 +298,36 @@ function generateNextFrame() {
 			const icon2 = icons[j];
 
 			// Check if any elements overlap...
-			const collision = elementsOverlapOrientation(icon.element, icon2.element);
-			if (collision !== overlap.NONE) {
-				switch (collision) {
-					case overlap.LEFT:
-						icon.horizontalVelocity = -1 * Math.abs(icon.horizontalVelocity);
-						icon2.horizontalVelocity = Math.abs(icon2.horizontalVelocity);
-						break;
-					case overlap.RIGHT:
-						icon.horizontalVelocity = Math.abs(icon.horizontalVelocity);
-						icon2.horizontalVelocity = -1 * Math.abs(icon2.horizontalVelocity);
-						break;
-					case overlap.TOP:
-						icon.verticalVelocity = -1 * Math.abs(icon.verticalVelocity);
-						icon2.verticalVelocity = Math.abs(icon2.verticalVelocity);
-						break;
-					case overlap.BOTTOM:
-						icon.verticalVelocity = Math.abs(icon.verticalVelocity);
-						icon2.verticalVelocity = -1 * Math.abs(icon2.verticalVelocity);
-						break;
-				}
+			const overlap = circlesOverlap(icon1.element, icon2.element);
+			if (overlap) {
+				// If so, we need to update the velocities of the icons
+				
+				const phiDeg = circlesOverlapAngle(icon1.element, icon2.element);
+				const theta1Deg = getAngle(100 * icon1.horizontalVelocity, 100 * icon1.verticalVelocity);
+				const theta2Deg = getAngle(100 * icon2.horizontalVelocity, 100 * icon2.verticalVelocity);
 
-				icon.updatePosition();
-				icon.animate();
+				const phi = Math.PI * (phiDeg / 180);
+				const theta1 = Math.PI * (theta1Deg / 180);
+				const theta2 = Math.PI * (theta2Deg / 180);
 
+				const v1 = Math.sqrt(Math.pow(icon1.horizontalVelocity, 2) + Math.pow(icon1.verticalVelocity, 2));
+				const v2 = Math.sqrt(Math.pow(icon2.horizontalVelocity, 2) + Math.pow(icon2.verticalVelocity, 2));
+
+				const v1x = (v2 * Math.cos(theta2 - phi) * Math.cos(phi)) + (v1 * Math.sin(theta1 - phi) * Math.cos(phi + (Math.PI / 2)));
+				const v1y = (v2 * Math.cos(theta2 - phi) * Math.sin(phi)) + (v1 * Math.sin(theta1 - phi) * Math.sin(phi + (Math.PI / 2)));
+
+				const v2x = (v1 * Math.cos(theta1 - phi) * Math.cos(phi)) + (v2 * Math.sin(theta2 - phi) * Math.cos(phi + (Math.PI / 2)));
+				const v2y = (v1 * Math.cos(theta1 - phi) * Math.sin(phi)) + (v2 * Math.sin(theta2 - phi) * Math.sin(phi + (Math.PI / 2)));
+
+				icon1.horizontalVelocity = v1x;
+				icon1.verticalVelocity = v1y;
+				icon1.updatePosition();
+				icon1.updatePosition();
+				icon1.animate();
+
+				icon2.horizontalVelocity = v2x;
+				icon2.verticalVelocity = v2y;
+				icon2.updatePosition();
 				icon2.updatePosition();
 				icon2.animate();
 			}
@@ -277,8 +337,13 @@ function generateNextFrame() {
 	animationFrame = window.requestAnimationFrame(generateNextFrame);
 }
 
-document.addEventListener("scroll", () => {
-	window.cancelAnimationFrame(animationFrame);
+document.addEventListener("scroll", (event) => {
+	if (window.scrollY > 0) {
+
+		window.cancelAnimationFrame(animationFrame);
+	} else {
+		animationFrame = window.requestAnimationFrame(generateNextFrame);
+	}
 });
 
 // https://developers.google.com/web/ilt/pwa/lab-offline-quickstart#52_activating_the_install_prompt
