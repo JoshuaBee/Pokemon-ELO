@@ -1,4 +1,4 @@
-const version = "1.07";
+const version = "1.08";
 const cacheName = "jb-${version}";
 
 self.addEventListener("install", e => {
@@ -10,6 +10,24 @@ self.addEventListener("install", e => {
 				"/index.html",
 				"/manifest.webmanifest",
 				"/sitemap.xml",
+				"/images/icons/bug.svg",
+				"/images/icons/dark.svg",
+				"/images/icons/dragon.svg",
+				"/images/icons/electric.svg",
+				"/images/icons/fairy.svg",
+				"/images/icons/fighting.svg",
+				"/images/icons/fire.svg",
+				"/images/icons/flying.svg",
+				"/images/icons/ghost.svg",
+				"/images/icons/grass.svg",
+				"/images/icons/ground.svg",
+				"/images/icons/ice.svg",
+				"/images/icons/normal.svg",
+				"/images/icons/poison.svg",
+				"/images/icons/psychic.svg",
+				"/images/icons/rock.svg",
+				"/images/icons/steel.svg",
+				"/images/icons/water.svg",
 				"/images/logos/company-logo-192.png",
 				"/images/logos/company-logo-192.svg",
 				"/images/logos/company-logo-512.png",
@@ -18,26 +36,13 @@ self.addEventListener("install", e => {
 				"/images/logos/logo-192.svg",
 				"/images/logos/logo-512.png",
 				"/images/logos/logo-512.svg",
-				"/images/icons/.svg",
-				"/images/icons/.svg",
-				"/images/icons/.svg",
-				"/images/icons/.svg",
-				"/images/icons/.svg",
-				"/images/icons/.svg",
-				"/images/icons/.svg",
-				"/images/icons/.svg",
-				"/images/icons/.svg",
-				"/images/icons/.svg",
-				"/images/icons/.svg",
-				"/images/icons/.svg",
-				"/images/icons/.svg",
-				"/images/icons/.svg",
-				"/images/icons/.svg",
-				"/images/icons/.svg",
-				"/images/icons/.svg",
-				"/images/icons/.svg",
+				"/images/pokemon/alakazam.png",
+				"/images/pokemon/dugtrio.png",
+				"/images/pokemon/gengar.png",
+				"/images/pokemon/kabutops.png",
+				"/images/pokemon/scyther.png",
+				"/images/pokemon/vulpix.png",
 				// "/images/screenshots/screenshot1.webp",
-				"/scripts/icons.js",
 				"/scripts/main.js",
 				"/styles/1-settings/color.css",
 				"/styles/2-tools/font.css",
@@ -45,7 +50,8 @@ self.addEventListener("install", e => {
 				"/styles/4-elements/body.css",
 				"/styles/6-components/button.css",
 				"/styles/6-components/footer.css",
-				"/styles/6-components/header.css"
+				"/styles/6-components/header.css",
+				"/styles/6-components/pokemon-grid.css"
 				
 			])
 			.then(() => self.skipWaiting());

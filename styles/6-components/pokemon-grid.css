@@ -1,0 +1,41 @@
+/*--------------------------------//
+//                                //
+//          Pokemon Grid          //
+//                                //
+//--------------------------------*/
+.pokemon-grid {
+	display: grid;
+	gap: 2rem;
+	grid-template-columns: repeat(3, 1fr);
+	margin: auto;
+	width: 75%;
+}
+
+.pokemon-card {
+	align-items: center;
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.pokemon-card__image-container {
+	aspect-ratio: 1 / 1;
+}
+
+.pokemon-card img {
+	display: block;
+	height: 100%;
+	width: 100%;
+}
+
+.pokemon-types {
+	display: flex;
+	gap: 0.25rem;
+}
+
+.pokemon-type {
+	background-color: var(--color-icon);
+	border-radius: 0.25rem;
+	color: #fff;
+	padding: 0.25rem;
+}
