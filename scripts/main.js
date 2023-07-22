@@ -97,9 +97,10 @@ class Icon {
 	}
 }
 
-class Pokemon {
-	constructor(type, defenseRating = 1000, offenseRating = 1000) {
-		this.type = type;
+class Pokémon {
+	constructor(type1, type2, defenseRating = 1000, offenseRating = 1000) {
+		this.type1 = type1;
+		this.type2 = type2;
 		this.defenseRating = defenseRating;
 		this.offenseRating = offenseRating;
 		// this.defenseWins = [];
@@ -115,15 +116,18 @@ class Bug {
 	constructor() {
 		this.type = types.BUG;
 		this.weakens = [
+			types.DARK,
 			types.GRASS,
-			types.POISON,
 			types.PSYCHIC,
 		];
 		this.resistedBy = [
+			types.FAIRY,
 			types.FIGHTING,
 			types.FIRE,
 			types.FLYING,
 			types.GHOST,
+			types.POISON,
+			types.STEEL,
 		];
 		this.unaffects = [
 			
@@ -136,7 +140,6 @@ class Bug {
 		this.weakTo = [
 			types.FIRE,
 			types.FLYING,
-			types.POISON,
 			types.ROCK,
 		];
 		this.unaffectedBy = [
@@ -699,17 +702,43 @@ class Water {
 // Elements
 const $header = document.querySelector('header');
 const $title = document.querySelector('h1');
-const $runELO = document.querySelector('[data-run-elo]');
+const $runOneTypeELO = document.querySelector('[data-type-count="1"] [data-run-elo]');
+const $oneTypeGrid = document.querySelector('[data-type-count="1"] [data-grid]');
+const $runTwoTypeELO = document.querySelector('[data-type-count="2"] [data-run-elo]');
+const $twoTypeGrid = document.querySelector('[data-type-count="2"] [data-grid]');
 
 // Constants
 const icons = [];
-const scale = 400;
-const k = 20;
-const seasons = 100;
+const typeClasses = [
+	new Bug(),
+	new Dark(),
+	new Dragon(),
+	new Electric(),
+	new Fairy(),
+	new Fire(),
+	new Fighting(),
+	new Flying(),
+	new Ghost(),
+	new Grass(),
+	new Ground(),
+	new Ice(),
+	new Normal(),
+	new Poison(),
+	new Psychic(),
+	new Rock(),
+	new Steel(),
+	new Water(),
+];
+const typeClassCount = typeClasses.length;
 
 // Variables
 let animationFrame;
 var deferredPrompt;
+let developmentCoefficient = 32;
+let scale = 400;
+let seasons = 100;
+let oneTypeGrid;
+let twoTypeGrid;
 
 document.addEventListener('DOMContentLoaded', () => {
 	loadIcons();
@@ -916,197 +945,413 @@ function generateNextFrame() {
 	animationFrame = window.requestAnimationFrame(generateNextFrame);
 }
 
-function runELO() {
-	const bugPokemon = new Pokemon(new Bug());
-	const darkPokemon = new Pokemon(new Dark());
-	const dragonPokemon = new Pokemon(new Dragon());
-	const electricPokemon = new Pokemon(new Electric());
-	const fairyPokemon = new Pokemon(new Fairy());
-	const firePokemon = new Pokemon(new Fire());
-	const fightingPokemon = new Pokemon(new Fighting());
-	const flyingPokemon = new Pokemon(new Flying());
-	const ghostPokemon = new Pokemon(new Ghost());
-	const grassPokemon = new Pokemon(new Grass());
-	const groundPokemon = new Pokemon(new Ground());
-	const icePokemon = new Pokemon(new Ice());
-	const normalPokemon = new Pokemon(new Normal());
-	const poisonPokemon = new Pokemon(new Poison());
-	const psychicPokemon = new Pokemon(new Psychic());
-	const rockPokemon = new Pokemon(new Rock());
-	const steelPokemon = new Pokemon(new Steel());
-	const waterPokemon = new Pokemon(new Water());
+function runOneTypeELO() {
+	const pokémon = [];
+	for (let type1Index = 0; type1Index < typeClassCount; type1Index++) {
+		pokémon.push(new Pokémon(typeClasses[type1Index]));
+	};
 
-	const pokemon = [
-		bugPokemon,
-		darkPokemon,
-		dragonPokemon,
-		electricPokemon,
-		fairyPokemon,
-		firePokemon,
-		fightingPokemon,
-		flyingPokemon,
-		ghostPokemon,
-		grassPokemon,
-		groundPokemon,
-		icePokemon,
-		normalPokemon,
-		poisonPokemon,
-		psychicPokemon,
-		rockPokemon,
-		steelPokemon,
-		waterPokemon,
-	];
+	const $developmentCoefficient = document.querySelector('#developmentCoefficient');
+	if ($developmentCoefficient) {
+		developmentCoefficient = $developmentCoefficient.value;
+	}
+
+	const $scale = document.querySelector('#scale');
+	if ($scale) {
+		scale = $scale.value;
+	}
+
+	const $seasons = document.querySelector('#seasons');
+	if ($seasons) {
+		seasons = $seasons.value;
+	}
 
 	for (let i = 0; i < seasons; i++) {
-		shuffle(pokemon);
+		shuffle(pokémon);
 		
 		// Run through every combination of battles.
-		for (let j = 0; j < pokemon.length; j += 1) {
-			for (let k = 0; k < pokemon.length; k += 1) {
+		for (let j = 0; j < pokémon.length; j += 1) {
+			for (let k = 0; k < pokémon.length; k += 1) {
 				if (j < k) {
-					battle(pokemon[j], pokemon[k]);
+					battle(pokémon[j], pokémon[k]);
 				}
 			}
 		}
 	}
 
-	pokemon.sort((a, b) => {
-		return b.offenseRating - a.offenseRating;
-	});
-
-	console.log('Offense', pokemon);
-
-	const a = structuredClone(pokemon);
-	a.sort((a, b) => {
-		return b.defenseRating - a.defenseRating;
-	});
-
-	console.log('Defense', a);
-
-	pokemon.map(poke => {
-		poke.sum = poke.defenseRating + poke.offenseRating;
+	const pokémonFormatted = pokémon.map(poké => {
+		return {
+			type: gridjs.html(`<div class="pokemon-types"><p class="pokemon-type ${poké.type1.type}">${poké.type1.type}</p></div>`),
+			offenseRating: Math.round(10 * poké.offenseRating) / 10,
+			defenseRating: Math.round(10 * poké.defenseRating) / 10,
+			averageRating: Math.round(10 * (poké.defenseRating + poké.offenseRating) / 2) / 10,
+		}
 	})
-	const b = structuredClone(pokemon);
-	b.sort((a, b) => {
-		return b.sum - a.sum;
+	pokémonFormatted.sort((a, b) => {
+		return b.averageRating - a.averageRating;
 	});
-	console.log('Sum', b);
+	
+	if (oneTypeGrid) {
+		oneTypeGrid.updateConfig({
+			data: pokémonFormatted
+		  }).forceRender();
+	} else {
+		oneTypeGrid = new gridjs.Grid({ 
+			columns: [
+				{
+					id: 'type',
+					name: 'Type',
+				},
+				{
+					id: 'offenseRating',
+					name: 'Offense ELO',
+					sort: true,
+				},
+				{
+					id: 'defenseRating',
+					name: 'Defense ELO',
+					sort: true,
+				},
+				{
+					id: 'averageRating',
+					name: 'Average ELO',
+					sort: true,
+				},
+			],
+			data: pokémonFormatted,
+			fixedHeader: true,
+		}).render($oneTypeGrid);
+	}
 }
 
-function battle(pokemon1, pokemon2) {
-	let pokemon1Attack = 1;
-	let pokemon1Defense = 1;
-	let pokemon2Attack = 1;
-	let pokemon2Defense = 1;
-	
-	if (pokemon1.type.weakens?.includes(pokemon2.type.type)) {
-		pokemon1Attack *= 2;
-		pokemon2Defense /= 2;
+function runTwoTypeELO() {
+	const pokémon = [];
+	for (let type1Index = 0; type1Index < typeClassCount; type1Index++) {
+		pokémon.push(new Pokémon(typeClasses[type1Index]));
+
+		for (let type2Index = type1Index + 1; type2Index < typeClassCount; type2Index++) {
+			pokémon.push(new Pokémon(typeClasses[type1Index], typeClasses[type2Index]));
+		};
+	};
+
+	const $developmentCoefficient = document.querySelector('#developmentCoefficient');
+	if ($developmentCoefficient) {
+		developmentCoefficient = $developmentCoefficient.value;
 	}
-	
-	if (pokemon1.type.resistedBy?.includes(pokemon2.type.type)) {
-		pokemon1Attack /= 2;
-		pokemon2Defense *= 2;
+
+	const $scale = document.querySelector('#scale');
+	if ($scale) {
+		scale = $scale.value;
 	}
-	
-	if (pokemon1.type.unaffects?.includes(pokemon2.type.type)) {
-		pokemon1Attack = 0;
-		pokemon2Defense = Infinity;
+
+	const $seasons = document.querySelector('#seasons');
+	if ($seasons) {
+		seasons = $seasons.value;
 	}
-	
-	
-	
-	if (pokemon2.type.weakens?.includes(pokemon1.type.type)) {
-		pokemon1Defense /= 2;
-		pokemon2Attack *= 2;
-	}
-	
-	if (pokemon2.type.resistedBy?.includes(pokemon1.type.type)) {
-		pokemon1Defense *= 2;
-		pokemon2Attack /= 2;
-	}
-	
-	if (pokemon2.type.unaffects?.includes(pokemon1.type.type)) {
-		pokemon1Defense = Infinity;
-		pokemon2Attack = 0;
-	}
-	
-	
-	
-	let pokemon1AttackScore = 0;
-	let pokemon2DefenseScore = 0;
-	if (pokemon1Attack > pokemon2Defense) {
-		pokemon1AttackScore = 1;
-		pokemon2DefenseScore = 0;
+
+	for (let i = 0; i < seasons; i++) {
+		shuffle(pokémon);
 		
-		// pokemon1.offenseWins.push(pokemon2.type);
-		// pokemon2.defenseLosses.push(pokemon1.type);
-	} else if (pokemon1Attack < pokemon2Defense) {
-		pokemon1AttackScore = 0;
-		pokemon2DefenseScore = 1;
-		
-		// pokemon1.offenseLosses.push(pokemon2.type);
-		// pokemon2.defenseWins.push(pokemon1.type);
+		// Run through every combination of battles.
+		for (let j = 0; j < pokémon.length; j += 1) {
+			for (let k = 0; k < pokémon.length; k += 1) {
+				if (j < k) {
+					battle(pokémon[j], pokémon[k]);
+				}
+			}
+		}
+	}
+
+	const pokémonFormatted = pokémon.map(poké => {
+		let type = `<div class="pokemon-types"><p class="pokemon-type ${poké.type1.type}">${poké.type1.type}</p>`;
+		if (poké.type2) {
+			type += `<p class="pokemon-type ${poké.type2.type}">${poké.type2.type}</p>`;
+		}
+		type += '</div>';
+
+		return {
+			type: gridjs.html(type),
+			offenseRating: Math.round(10 * poké.offenseRating) / 10,
+			defenseRating: Math.round(10 * poké.defenseRating) / 10,
+			averageRating: Math.round(10 * (poké.defenseRating + poké.offenseRating) / 2) / 10,
+		}
+	})
+	pokémonFormatted.sort((a, b) => {
+		return b.averageRating - a.averageRating;
+	});
+	
+	if (twoTypeGrid) {
+		// https://github.com/grid-js/gridjs/issues/1291#issuecomment-1549489308
+		Promise.resolve(twoTypeGrid.config.plugin.remove("pagination"))
+			.then(() => {
+				twoTypeGrid.updateConfig({
+					data: pokémonFormatted
+				}).forceRender();
+			});
 	} else {
-		pokemon1AttackScore = 0.5;
-		pokemon2DefenseScore = 0.5;
-		
-		// pokemon1.offenseDraws.push(pokemon2.type);
-		// pokemon2.defenseDraws.push(pokemon1.type);
+		twoTypeGrid = new gridjs.Grid({ 
+			columns: [
+				{
+					id: 'type',
+					name: 'Type',
+				},
+				{
+					id: 'offenseRating',
+					name: 'Offense ELO',
+					sort: true,
+				},
+				{
+					id: 'defenseRating',
+					name: 'Defense ELO',
+					sort: true,
+				},
+				{
+					id: 'averageRating',
+					name: 'Average ELO',
+					sort: true,
+				},
+			],
+			data: pokémonFormatted,
+			pagination: {
+				limit: 10
+			},
+			fixedHeader: true,
+		}).render($twoTypeGrid);
+	}
+}
+
+function battle(pokémon1, pokémon2) {
+	let pokémon1Attack = 1;
+	let pokémon1Defense = 1;
+	let pokémon1Type1Attack = 1;
+	let pokémon1Type2Attack = 1;
+	let pokémon1Type1Defense = 1;
+	let pokémon1Type2Defense = 1;
+	let pokémon2Attack = 1;
+	let pokémon2Defense = 1;
+	let pokémon2Type1Attack = 1;
+	let pokémon2Type2Attack = 1;
+	let pokémon2Type1Defense = 1;
+	let pokémon2Type2Defense = 1;
+	
+	if (pokémon1.type1?.weakens?.includes(pokémon2.type1?.type)) {
+		pokémon1Type1Attack *= 2;
+		pokémon2Type1Defense /= 2;
 	}
 	
-	let pokemon1DefenseScore = 0;
-	let pokemon2AttackScore = 0;
-	if (pokemon1Defense > pokemon2Attack) {
-		pokemon1DefenseScore = 1;
-		pokemon2AttackScore = 0;
+	if (pokémon1.type1?.weakens?.includes(pokémon2.type2?.type)) {
+		pokémon1Type1Attack *= 2;
+		pokémon2Type1Defense /= 2;
+	}
+	
+	if (pokémon1.type1?.resistedBy?.includes(pokémon2.type1?.type)) {
+		pokémon1Type1Attack /= 2;
+		pokémon2Type1Defense *= 2;
+	}
+	
+	if (pokémon1.type1?.resistedBy?.includes(pokémon2.type2?.type)) {
+		pokémon1Type1Attack /= 2;
+		pokémon2Type1Defense *= 2;
+	}
+	
+	if (pokémon1.type1?.unaffects?.includes(pokémon2.type1?.type)) {
+		pokémon1Type1Attack = 0;
+		pokémon2Type1Defense = Infinity;
+	}
+	
+	if (pokémon1.type1?.unaffects?.includes(pokémon2.type2?.type)) {
+		pokémon1Type1Attack = 0;
+		pokémon2Type1Defense = Infinity;
+	}
+
+	pokémon1Attack = pokémon1Type1Attack;
+	pokémon2Defense = pokémon2Type1Defense;
+
+	if (pokémon1.type2) {
+		if (pokémon1.type2?.weakens?.includes(pokémon2.type1?.type)) {
+			pokémon1Type2Attack *= 2;
+			pokémon2Type2Defense /= 2;
+		}
 		
-		// pokemon1.defenseWins.push(pokemon2.type);
-		// pokemon2.offenseLosses.push(pokemon1.type);
-	} else if (pokemon1Defense < pokemon2Attack) {
-		pokemon1DefenseScore = 0;
-		pokemon2AttackScore = 1;
+		if (pokémon1.type2?.weakens?.includes(pokémon2.type2?.type)) {
+			pokémon1Type2Attack *= 2;
+			pokémon2Type2Defense /= 2;
+		}
 		
-		// pokemon1.defenseLosses.push(pokemon2.type);
-		// pokemon2.offenseWins.push(pokemon1.type);
+		if (pokémon1.type2?.resistedBy?.includes(pokémon2.type1?.type)) {
+			pokémon1Type2Attack /= 2;
+			pokémon2Type2Defense *= 2;
+		}
+		
+		if (pokémon1.type2?.resistedBy?.includes(pokémon2.type2?.type)) {
+			pokémon1Type2Attack /= 2;
+			pokémon2Type2Defense *= 2;
+		}
+		
+		if (pokémon1.type2?.unaffects?.includes(pokémon2.type1?.type)) {
+			pokémon1Type2Attack = 0;
+			pokémon2Type2Defense = Infinity;
+		}
+		
+		if (pokémon1.type2?.unaffects?.includes(pokémon2.type2?.type)) {
+			pokémon1Type2Attack = 0;
+			pokémon2Type2Defense = Infinity;
+		}
+
+		if (pokémon1Type2Attack > pokémon1Type1Attack) {
+			pokémon1Attack = pokémon1Type2Attack;
+			pokémon2Defense = pokémon2Type2Defense;
+		}
+	}
+
+
+	
+	if (pokémon2.type1?.weakens?.includes(pokémon1.type1?.type)) {
+		pokémon1Type1Defense /= 2;
+		pokémon2Type1Attack *= 2;
+	}
+
+	if (pokémon2.type1?.weakens?.includes(pokémon1.type2?.type)) {
+		pokémon1Type1Defense /= 2;
+		pokémon2Type1Attack *= 2;
+	}
+	
+	if (pokémon2.type1?.resistedBy?.includes(pokémon1.type1?.type)) {
+		pokémon1Type1Defense *= 2;
+		pokémon2Type1Attack /= 2;
+	}
+	
+	if (pokémon2.type1?.resistedBy?.includes(pokémon1.type2?.type)) {
+		pokémon1Type1Defense *= 2;
+		pokémon2Type1Attack /= 2;
+	}
+	
+	if (pokémon2.type1?.unaffects?.includes(pokémon1.type1?.type)) {
+		pokémon1Type1Defense = Infinity;
+		pokémon2Type1Attack = 0;
+	}
+	
+	if (pokémon2.type1?.unaffects?.includes(pokémon1.type2?.type)) {
+		pokémon1Type1Defense = Infinity;
+		pokémon2Type1Attack = 0;
+	}
+
+	pokémon1Defense = pokémon1Type1Defense;
+	pokémon2Attack = pokémon2Type1Attack;
+	
+	if (pokémon2.type2) {
+		if (pokémon2.type2?.weakens?.includes(pokémon1.type1?.type)) {
+			pokémon1Type2Defense /= 2;
+			pokémon2Type2Attack *= 2;
+		}
+	
+		if (pokémon2.type2?.weakens?.includes(pokémon1.type2?.type)) {
+			pokémon1Type2Defense /= 2;
+			pokémon2Type2Attack *= 2;
+		}
+		
+		if (pokémon2.type2?.resistedBy?.includes(pokémon1.type1?.type)) {
+			pokémon1Type2Defense *= 2;
+			pokémon2Type2Attack /= 2;
+		}
+		
+		if (pokémon2.type2?.resistedBy?.includes(pokémon1.type2?.type)) {
+			pokémon1Type2Defense *= 2;
+			pokémon2Type2Attack /= 2;
+		}
+		
+		if (pokémon2.type2?.unaffects?.includes(pokémon1.type1?.type)) {
+			pokémon1Type2Defense = Infinity;
+			pokémon2Type2Attack = 0;
+		}
+		
+		if (pokémon2.type2?.unaffects?.includes(pokémon1.type2?.type)) {
+			pokémon1Type2Defense = Infinity;
+			pokémon2Type2Attack = 0;
+		}
+	
+		if (pokémon2Type2Attack > pokémon2Type1Attack) {
+			pokémon1Defense = pokémon1Type2Defense;
+			pokémon2Attack = pokémon2Type2Attack;
+		}
+	}
+	
+	
+	
+	let pokémon1AttackScore = 0;
+	let pokémon2DefenseScore = 0;
+	if (pokémon1Attack > pokémon2Defense) {
+		pokémon1AttackScore = 1;
+		pokémon2DefenseScore = 0;
+		
+		// pokémon1.offenseWins.push(pokémon2.type);
+		// pokémon2.defenseLosses.push(pokémon1.type);
+	} else if (pokémon1Attack < pokémon2Defense) {
+		pokémon1AttackScore = 0;
+		pokémon2DefenseScore = 1;
+		
+		// pokémon1.offenseLosses.push(pokémon2.type);
+		// pokémon2.defenseWins.push(pokémon1.type);
 	} else {
-		pokemon1DefenseScore = 0.5;
-		pokemon2AttackScore = 0.5;
+		pokémon1AttackScore = 0.5;
+		pokémon2DefenseScore = 0.5;
 		
-		// pokemon1.defenseDraws.push(pokemon2.type);
-		// pokemon2.offenseDraws.push(pokemon1.type);
+		// pokémon1.offenseDraws.push(pokémon2.type);
+		// pokémon2.defenseDraws.push(pokémon1.type);
+	}
+	
+	let pokémon1DefenseScore = 0;
+	let pokémon2AttackScore = 0;
+	if (pokémon1Defense > pokémon2Attack) {
+		pokémon1DefenseScore = 1;
+		pokémon2AttackScore = 0;
+		
+		// pokémon1.defenseWins.push(pokémon2.type);
+		// pokémon2.offenseLosses.push(pokémon1.type);
+	} else if (pokémon1Defense < pokémon2Attack) {
+		pokémon1DefenseScore = 0;
+		pokémon2AttackScore = 1;
+		
+		// pokémon1.defenseLosses.push(pokémon2.type);
+		// pokémon2.offenseWins.push(pokémon1.type);
+	} else {
+		pokémon1DefenseScore = 0.5;
+		pokémon2AttackScore = 0.5;
+		
+		// pokémon1.defenseDraws.push(pokémon2.type);
+		// pokémon2.offenseDraws.push(pokémon1.type);
 	}
 	
 	// Calculate Scores
-	const difference1 = pokemon2.defenseRating - pokemon1.offenseRating;
+	const difference1 = pokémon2.defenseRating - pokémon1.offenseRating;
 	const differenceRatio1 = 1.0 * difference1 / scale;
 	const power1 = 1 + Math.pow(10, differenceRatio1);
 	const expectedScore1 = 1 / power1;
-	const newRating1 = Math.round(10 * (pokemon1.offenseRating + (k * (pokemon1AttackScore - expectedScore1)))) / 10;
+	const newRating1 = Math.round(10 * (pokémon1.offenseRating + (developmentCoefficient * (pokémon1AttackScore - expectedScore1)))) / 10;
 	
-	const difference2 = pokemon1.defenseRating - pokemon2.offenseRating;
+	const difference2 = pokémon1.defenseRating - pokémon2.offenseRating;
 	const differenceRatio2 = 1.0 * difference2 / scale;
 	const power2 = 1 + Math.pow(10, differenceRatio2);
 	const expectedScore2 = 1 / power2;
-	const newRating2 = Math.round(10 * (pokemon2.offenseRating + (k * (pokemon2AttackScore - expectedScore2)))) / 10;
+	const newRating2 = Math.round(10 * (pokémon2.offenseRating + (developmentCoefficient * (pokémon2AttackScore - expectedScore2)))) / 10;
 	
-	const difference3 = pokemon2.offenseRating - pokemon1.defenseRating;
+	const difference3 = pokémon2.offenseRating - pokémon1.defenseRating;
 	const differenceRatio3 = 1.0 * difference3 / scale;
 	const power3 = 1 + Math.pow(10, differenceRatio3);
 	const expectedScore3 = 1 / power3;
-	const newRating3 = Math.round(10 * (pokemon1.defenseRating + (k * (pokemon1DefenseScore - expectedScore3)))) / 10;
+	const newRating3 = Math.round(10 * (pokémon1.defenseRating + (developmentCoefficient * (pokémon1DefenseScore - expectedScore3)))) / 10;
 	
-	const difference4 = pokemon1.offenseRating - pokemon2.defenseRating;
+	const difference4 = pokémon1.offenseRating - pokémon2.defenseRating;
 	const differenceRatio4 = 1.0 * difference4 / scale;
 	const power4 = 1 + Math.pow(10, differenceRatio4);
 	const expectedScore4 = 1 / power4;
-	const newRating4 = Math.round(10 * (pokemon2.defenseRating + (k * (pokemon2DefenseScore - expectedScore4)))) / 10;
+	const newRating4 = Math.round(10 * (pokémon2.defenseRating + (developmentCoefficient * (pokémon2DefenseScore - expectedScore4)))) / 10;
 	
 	// Update Scores
-	pokemon1.offenseRating = newRating1;
-	pokemon2.offenseRating = newRating2;
-	pokemon1.defenseRating = newRating3;
-	pokemon2.defenseRating = newRating4;
+	pokémon1.offenseRating = newRating1;
+	pokémon2.offenseRating = newRating2;
+	pokémon1.defenseRating = newRating3;
+	pokémon2.defenseRating = newRating4;
 }
 
 function shuffle(array) {
@@ -1137,9 +1382,15 @@ function registerEventListeners() {
 		}
 	});
 
-	if ($runELO) {
-		$runELO.addEventListener('click', () => {
-			runELO();
+	if ($runOneTypeELO) {
+		$runOneTypeELO.addEventListener('click', () => {
+			runOneTypeELO();
+		});
+	}
+
+	if ($runTwoTypeELO) {
+		$runTwoTypeELO.addEventListener('click', () => {
+			runTwoTypeELO();
 		});
 	}
 	

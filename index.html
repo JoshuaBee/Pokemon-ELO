@@ -34,6 +34,9 @@
 		<link href="styles/6-components/footer.css" rel="stylesheet" />
 		<link href="styles/6-components/header.css" rel="stylesheet" />
 		<link href="styles/6-components/pokemon-grid.css" rel="stylesheet" />
+
+		<!-- Vendors -->
+		<link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
 	</head>
 
 	<body>
@@ -42,6 +45,12 @@
 		</header>
 
 		<main>
+			<p>
+				Pokémon have 18 possible types, it is essentially like rock, paper, scissors but with 18 possible hand shapes.
+				<br />
+				Here are a few Pokémon and their types:
+			</p>
+
 			<div class="pokemon-grid">
 				<div class="pokemon-card">
 					<div class="pokemon-card__image-container">
@@ -94,6 +103,79 @@
 					</div>
 				</div>
 			</div>
+
+			<p>
+				Each type also has weaknesses, resistances and immunities against the other types.
+				<br />
+				For example:
+				<br />
+				<span class="pokemon-type fire">Fire</span> is weak to <span class="pokemon-type water">Water</span>, meaning a <span class="pokemon-type water">Water</span> attack will do double damage to a <span class="pokemon-type fire">Fire</span> Pokémon.
+				<br />
+				<span class="pokemon-type dragon">Dragon</span> resists <span class="pokemon-type grass">Grass</span>, meaning a <span class="pokemon-type grass">Grass</span> attack will do half damage to a <span class="pokemon-type dragon">Dragon</span> Pokémon.
+				<br />
+				<span class="pokemon-type flying">Flying</span> is immune to <span class="pokemon-type ground">Ground</span>, meaning a <span class="pokemon-type ground">Ground</span> attack will do no damage to a <span class="pokemon-type flying">Flying</span> Pokémon.
+				<br />
+			</p>
+
+			<p>
+				One way to competitively rank similar competitors is by using the ELO system.
+				In its most famous incarnation it is used to rank chess players, but it can be used to rank anything. We are going to use it to rank Pokémon types.
+				A simple explanation of how ELO works is that winning matches wins you points, and losing matches loses you points. The points you earn/forfeit depend on the skill difference of the opponents. I like to visualise it in 4 different examples:
+			</p>
+
+			<ul>
+				<li>If I am much better than my opponent and I win, I don't get many points.</li>
+				<li>If I am much worse than my opponent and I win, I get a lot of points.</li>
+				<li>If I am much better than my opponent and I lose, I lose a lot of points.</li>
+				<li>If I am much worse than my opponent and I lose, I don't lose many points.</li>
+			</ul>
+
+			<div data-type-count="1">
+				<label
+					for="developmentCoefficient"
+				>
+					Development Coefficient
+				</label>
+				<input
+					id="developmentCoefficient"
+					type="number"
+					value="32"
+				/>
+				<br />
+				<label
+					for="scale"
+				>
+					Scale
+				</label>
+				<input
+					id="scale"
+					type="number"
+					value="400"
+				/>
+				<br />
+				<label
+					for="seasons"
+				>
+					Seasons
+				</label>
+				<input
+					id="seasons"
+					type="number"
+					value="100"
+				/>
+				<br />
+				<button data-run-elo>
+					Run One Type ELO
+				</button>
+				<br />
+				<div data-grid></div>
+			</div>
+			
+			<p>
+				Unfortunately, Pokémon is a bit more complicated than this. Pokémon can have 2 types, which is equivalent to playing rock, paper, scissors with both hands at the same time.
+				<br />
+				Here are a few Pokémon with multiple types:
+			</p>
 
 			<div class="pokemon-grid">
 				<div class="pokemon-card">
@@ -160,9 +242,59 @@
 				</div>
 			</div>
 
-			<button data-run-elo>
-				Run ELO
-			</button>
+			<p>
+				This also means both types are factored into the weaknesses, resistances and immunities calculations.
+				<br />
+				For example:
+				<br />
+				Both <span class="pokemon-type fire">Fire</span> and <span class="pokemon-type rock">Rock</span> are weak to <span class="pokemon-type water">Water</span>, meaning a <span class="pokemon-type water">Water</span> attack will do quadruple damage to a <span class="pokemon-type fire">Fire</span> <span class="pokemon-type rock">Rock</span> Pokémon.
+				<br />
+				Both <span class="pokemon-type dragon">Dragon</span> and <span class="pokemon-type poison">Poison</span> resist <span class="pokemon-type grass">Grass</span>, meaning a <span class="pokemon-type grass">Grass</span> attack will do quarter damage to a <span class="pokemon-type dragon">Dragon</span> <span class="pokemon-type poison">Poison</span> Pokémon.
+				<br />
+				<span class="pokemon-type fighting">Fighting</span> resists <span class="pokemon-type dark">Dark</span>, and <span class="pokemon-type ghost">Ghost</span> is weak to <span class="pokemon-type dark">Dark</span>, meaning a <span class="pokemon-type dark">Dark</span> attack will do neutral damage to a <span class="pokemon-type fighting">Fighting</span> <span class="pokemon-type ghost">Ghost</span> Pokémon.
+				<br />
+			</p>
+
+			<div data-type-count="2">
+				<label
+					for="developmentCoefficient"
+				>
+					Development Coefficient
+				</label>
+				<input
+					id="developmentCoefficient"
+					type="number"
+					value="32"
+				/>
+				<br />
+				<label
+					for="scale"
+				>
+					Scale
+				</label>
+				<input
+					id="scale"
+					type="number"
+					value="400"
+				/>
+				<br />
+				<label
+					for="seasons"
+				>
+					Seasons
+				</label>
+				<input
+					id="seasons"
+					type="number"
+					value="100"
+				/>
+				<br />
+				<button data-run-elo>
+					Run Two Type ELO
+				</button>
+				<br />
+				<div data-grid></div>
+			</div>
 		</main>
 
 		<footer>
@@ -181,6 +313,7 @@
 
 		<!-- Main Javascript -->
 		<script src="scripts/main.js"></script>
+		<script src="https://unpkg.com/gridjs/dist/gridjs.umd.js" defer></script>
 		<script>
 			if ('serviceWorker' in navigator) {
 			  navigator.serviceWorker.register('/service-worker.js')
