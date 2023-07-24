@@ -3,10 +3,10 @@
 	<head>
 		<link rel="preconnect" href="https://font.gstatic.com/" crossorigin>
 
-		<title>Pokémon Type ELO</title>
+		<title>Pokémon Type Elo</title>
 		<meta charset="utf-8" />
 		<meta name="author" content="Joshua Bee" />
-		<meta name="description" content="Pokémon Type ELO" />
+		<meta name="description" content="Pokémon Type Elo" />
 		<!-- Let browser know website is optimized for mobile -->
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		<link rel="icon" type="image/png" href="images/logos/logo-192.png" />
@@ -28,6 +28,7 @@
 
 		<!-- Elements -->
 		<link href="styles/4-elements/body.css" rel="stylesheet" />
+		<link href="styles/4-elements/main.css" rel="stylesheet" />
 		
 		<!-- Components -->
 		<link href="styles/6-components/button.css" rel="stylesheet" />
@@ -41,13 +42,16 @@
 
 	<body>
 		<header>
-			<h1>Pokémon<br>Type ELO</h1>
+			<h1>Pokémon<br>Type Elo</h1>
 		</header>
 
 		<main>
+			<h2>Pokémon Introduction</h2>
 			<p>
-				Pokémon have 18 possible types, it is essentially like rock, paper, scissors but with 18 possible hand shapes.
-				<br />
+				Pokémon, for those that do not know, are a fictional species of collectible monsters, each having unique designs, skills and powers. Pokémon have one of 18 possible types. Each type has weaknesses, resistances and immunities against the other types. It is essentially like rock, paper, scissors but with 18 possible hand shapes.
+			</p>
+			<br />
+			<p>
 				Here are a few Pokémon and their types:
 			</p>
 
@@ -59,6 +63,7 @@
 							alt="Vulpix"
 							height="500"
 							width="500"
+							loading="lazy"
 						/>
 					</div>
 
@@ -76,6 +81,7 @@
 							alt="Dugtrio"
 							height="500"
 							width="500"
+							loading="lazy"
 						/>
 					</div>
 
@@ -93,6 +99,7 @@
 							alt="Alakazam"
 							height="500"
 							width="500"
+							loading="lazy"
 						/>
 					</div>
 
@@ -105,10 +112,6 @@
 			</div>
 
 			<p>
-				Each type also has weaknesses, resistances and immunities against the other types.
-				<br />
-				For example:
-				<br />
 				<span class="pokemon-type fire">Fire</span> is weak to <span class="pokemon-type water">Water</span>, meaning a <span class="pokemon-type water">Water</span> attack will do double damage to a <span class="pokemon-type fire">Fire</span> Pokémon.
 				<br />
 				<span class="pokemon-type dragon">Dragon</span> resists <span class="pokemon-type grass">Grass</span>, meaning a <span class="pokemon-type grass">Grass</span> attack will do half damage to a <span class="pokemon-type dragon">Dragon</span> Pokémon.
@@ -117,63 +120,108 @@
 				<br />
 			</p>
 
+			<h2>Elo Introduction</h2>
+
 			<p>
-				One way to competitively rank similar competitors is by using the ELO system.
-				In its most famous incarnation it is used to rank chess players, but it can be used to rank anything. We are going to use it to rank Pokémon types.
-				A simple explanation of how ELO works is that winning matches wins you points, and losing matches loses you points. The points you earn/forfeit depend on the skill difference of the opponents. I like to visualise it in 4 different examples:
+				One way to competitively rank similar competitors is by using the <a href="https://en.wikipedia.org/wiki/Elo_rating_system">Elo rating system</a>.
+				In its most famous incarnation it is used to rank chess players, but it can be used to rank any zero-sum game. We are going to use it to rank Pokémon types.
+				A simple explanation of how Elo works is that winning matches increases your rating, and losing matches decreases your rating. The points you gain or lose depend on the relative rating difference of the opponents.
+			</p>
+			<br />
+			<p>
+				I like to visualise it in 4 different examples:
 			</p>
 
 			<ul>
-				<li>If I am much better than my opponent and I win, I don't get many points.</li>
-				<li>If I am much worse than my opponent and I win, I get a lot of points.</li>
-				<li>If I am much better than my opponent and I lose, I lose a lot of points.</li>
-				<li>If I am much worse than my opponent and I lose, I don't lose many points.</li>
+				<li>If I am much better than my opponent and I win, I increase my rating, but not by much.</li>
+				<li>If I am much worse than my opponent and I win, I increase my rating by a lot.</li>
+				<li>If I am much better than my opponent and I lose, I decrease my rating by a lot.</li>
+				<li>If I am much worse than my opponent and I lose, I decrease my rating, but not by much.</li>
 			</ul>
 
+			<h2>Pokémon Type Elo</h2>
+
+			<p>
+				Below is a calculator which can run a simulation of Pokémon type battles. Every type starts out with the same Elo rating, and after every battle the ratings get updated.
+			</p>
+
 			<div data-type-count="1">
-				<label
-					for="developmentCoefficient"
-				>
-					Development Coefficient
-				</label>
-				<input
-					id="developmentCoefficient"
-					type="number"
-					value="32"
-				/>
-				<br />
-				<label
-					for="scale"
-				>
-					Scale
-				</label>
-				<input
-					id="scale"
-					type="number"
-					value="400"
-				/>
-				<br />
-				<label
-					for="seasons"
-				>
-					Seasons
-				</label>
-				<input
-					id="seasons"
-					type="number"
-					value="100"
-				/>
-				<br />
-				<button data-run-elo>
-					Run One Type ELO
-				</button>
-				<br />
+				<form>
+					<div data-input-group>
+						<label
+							for="oneTypeDevelopmentCoefficient"
+						>
+							Development Coefficient
+						</label>
+						<input
+							id="oneTypeDevelopmentCoefficient"
+							type="number"
+							value="32"
+							min="1"
+							data-development-coefficient
+						/>
+					</div>
+					
+					<div data-input-group>
+						<label
+							for="oneTypeRating"
+						>
+							Rating
+						</label>
+						<input
+							id="oneTypeRating"
+							type="number"
+							value="1000"
+							min="1"
+							data-rating
+						/>
+					</div>
+					
+					<div data-input-group>
+						<label
+							for="oneTypeScale"
+						>
+							Scale
+						</label>
+						<input
+							id="oneTypeScale"
+							type="number"
+							value="400"
+							min="1"
+							data-scale
+						/>
+					</div>
+					
+					<div data-input-group>
+						<label
+							for="oneTypeSeasons"
+						>
+							Seasons
+						</label>
+						<input
+							id="oneTypeSeasons"
+							type="number"
+							value="100"
+							min="1"
+							data-seasons
+						/>
+					</div>
+					
+					<button type="button" data-run-elo>
+						Run One Type Elo
+					</button>
+				</form>
+				
 				<div data-grid></div>
 			</div>
+
+			<h2>Pokémon with Multiple Types</h2>
 			
 			<p>
-				Unfortunately, Pokémon is a bit more complicated than this. Pokémon can have 2 types, which is equivalent to playing rock, paper, scissors with both hands at the same time.
-				<br />
+				Unfortunately, Pokémon is a bit more complicated than this. Pokémon can have 2 types, which is equivalent to playing rock, paper, scissors with both hands at the same time. This also means both types are factored into the weaknesses, resistances and immunities calculations.
+			</p>
+			<br />
+			<p>
 				Here are a few Pokémon with multiple types:
 			</p>
 
@@ -185,6 +233,7 @@
 							alt="Kabutops"
 							height="500"
 							width="500"
+							loading="lazy"
 						/>
 					</div>
 
@@ -206,6 +255,7 @@
 							alt="Gengar"
 							height="500"
 							width="500"
+							loading="lazy"
 						/>
 					</div>
 
@@ -227,6 +277,7 @@
 							alt="Scyther"
 							height="500"
 							width="500"
+							loading="lazy"
 						/>
 					</div>
 
@@ -243,10 +294,6 @@
 			</div>
 
 			<p>
-				This also means both types are factored into the weaknesses, resistances and immunities calculations.
-				<br />
-				For example:
-				<br />
 				Both <span class="pokemon-type fire">Fire</span> and <span class="pokemon-type rock">Rock</span> are weak to <span class="pokemon-type water">Water</span>, meaning a <span class="pokemon-type water">Water</span> attack will do quadruple damage to a <span class="pokemon-type fire">Fire</span> <span class="pokemon-type rock">Rock</span> Pokémon.
 				<br />
 				Both <span class="pokemon-type dragon">Dragon</span> and <span class="pokemon-type poison">Poison</span> resist <span class="pokemon-type grass">Grass</span>, meaning a <span class="pokemon-type grass">Grass</span> attack will do quarter damage to a <span class="pokemon-type dragon">Dragon</span> <span class="pokemon-type poison">Poison</span> Pokémon.
@@ -255,44 +302,78 @@
 				<br />
 			</p>
 
+			<h2>Pokémon Types Elo</h2>
+
+			<p>
+				Below is a calculator which can run a simulation of Pokémon type battles. It is similar to the previous calculator, except now for every season there are 14,535 distinct battles (compared to 153 battles per season with 1 type).
+			</p>
+
 			<div data-type-count="2">
-				<label
-					for="developmentCoefficient"
-				>
-					Development Coefficient
-				</label>
-				<input
-					id="developmentCoefficient"
-					type="number"
-					value="32"
-				/>
-				<br />
-				<label
-					for="scale"
-				>
-					Scale
-				</label>
-				<input
-					id="scale"
-					type="number"
-					value="400"
-				/>
-				<br />
-				<label
-					for="seasons"
-				>
-					Seasons
-				</label>
-				<input
-					id="seasons"
-					type="number"
-					value="100"
-				/>
-				<br />
-				<button data-run-elo>
-					Run Two Type ELO
-				</button>
-				<br />
+				<form>
+					<div data-input-group>
+						<label
+							for="twoTypeDevelopmentCoefficient"
+						>
+							Development Coefficient
+						</label>
+						<input
+							id="twoTypeDevelopmentCoefficient"
+							type="number"
+							value="32"
+							min="1"
+							data-development-coefficient
+						/>
+					</div>
+
+					<div data-input-group>
+						<label
+							for=twoTypeRrating"
+						>
+							Rating
+						</label>
+						<input
+							id="twoTypeRating"
+							type="number"
+							value="1000"
+							min="1"
+							data-rating
+						/>
+					</div>
+					
+					<div data-input-group>
+						<label
+							for="twoTypeScale"
+						>
+							Scale
+						</label>
+						<input
+							id="twoTypeScale"
+							type="number"
+							value="400"
+							min="1"
+							data-scale
+						/>
+					</div>
+					
+					<div data-input-group>
+						<label
+							for="twoTypeSeasons"
+						>
+							Seasons
+						</label>
+						<input
+							id="twoTypeSeasons"
+							type="number"
+							value="100"
+							min="1"
+							data-seasons
+						/>
+					</div>
+					
+					<button type="button" data-run-elo>
+						Run Two Type Elo
+					</button>
+				</form>
 				<div data-grid></div>
 			</div>
 		</main>

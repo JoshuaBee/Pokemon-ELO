@@ -1,0 +1,86 @@
+/*--------------------------------//
+//                                //
+//              Main              //
+//                                //
+//--------------------------------*/
+main {
+	max-width: 100vw;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	text-align: center;
+    margin: auto;
+	max-width: 80ch;
+    padding: 0 1rem 2rem;
+}
+
+main h2 {
+	display: flex;
+	font-size: 3rem;
+	letter-spacing: 0rem;
+	line-height: 1.3;
+    margin-block-end: 2rem;
+	margin-block-start: 4rem;
+	font-weight: 500;
+	text-align: center;
+}
+
+main h2:first-of-type {
+	margin-block-start: 0;
+}
+
+main h3 {
+	display: flex;
+	font-size: 2rem;
+	letter-spacing: 0rem;
+	line-height: 1.3;
+    margin-block-end: 1rem;
+	margin-block-start: 2rem;
+	font-weight: 400;
+	text-align: center;
+}
+
+main p {
+	line-height: 1.3;
+}
+
+main ul {
+	margin-block-start: 1rem;
+    padding-inline-start: 1rem;
+	text-align: left;
+}
+
+main img {
+	width: 100%;
+}
+
+main a {
+	color: var(--color-primary);
+}
+
+main [data-type-count] {
+	width: 100%;
+}
+
+main form {
+	align-items: center;
+	display: flex;
+	gap: 0.5rem;
+	flex-direction: column;
+    margin: 2rem auto 0;
+	width: 75%;
+}
+
+main form [data-input-group] {
+	display: flex;
+	justify-content: space-between;
+	text-align: left;
+	width: 100%;
+}
+
+main [data-grid] {
+	margin-top: 2rem;
+	max-width: calc(100vw - 2rem);
+	min-height: 37.5rem;
+}

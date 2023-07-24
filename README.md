@@ -1,1 +1,1 @@
-# Pokémon Type ELO
+# Pokémon Type Elo

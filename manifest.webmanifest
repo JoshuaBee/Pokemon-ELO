@@ -17,17 +17,17 @@
       "purpose": "any maskable"
     }
   ],
-  "name": "Pokémon Type ELO",
+  "name": "Pokémon Type Elo",
   "screenshots" : [
     {
       "src": "images/screenshots/screenshot1.webp",
       "sizes": "3360x1670",
       "type": "image/webp",
       "platform": "wide",
-      "label": "Homescreen of Pokémon Type ELO"
+      "label": "Homescreen of Pokémon Type Elo"
     }
   ],
-  "short_name": "Pokémon Type ELO",
+  "short_name": "Pokémon Type Elo",
   "start_url": "/",
   "theme_color": "#0164b4"
 }

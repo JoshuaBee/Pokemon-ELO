@@ -702,10 +702,20 @@ class Water {
 // Elements
 const $header = document.querySelector('header');
 const $title = document.querySelector('h1');
-const $runOneTypeELO = document.querySelector('[data-type-count="1"] [data-run-elo]');
-const $oneTypeGrid = document.querySelector('[data-type-count="1"] [data-grid]');
-const $runTwoTypeELO = document.querySelector('[data-type-count="2"] [data-run-elo]');
-const $twoTypeGrid = document.querySelector('[data-type-count="2"] [data-grid]');
+const $oneTypeContainer = document.querySelector('[data-type-count="1"]');
+const $runOneTypeElo = $oneTypeContainer.querySelector('[data-run-elo]');
+const $oneTypeGrid = $oneTypeContainer.querySelector('[data-grid]');
+const $oneTypeDevelopmentCoefficient = $oneTypeContainer.querySelector('[data-development-coefficient]');
+const $oneTypeRating = $oneTypeContainer.querySelector('[data-rating]');
+const $oneTypeScale = $oneTypeContainer.querySelector('[data-scale]');
+const $oneTypeSeasons = $oneTypeContainer.querySelector('[data-seasons]');
+const $twoTypeContainer = document.querySelector('[data-type-count="2"]');
+const $runTwoTypeElo = $twoTypeContainer.querySelector('[data-run-elo]');
+const $twoTypeGrid = $twoTypeContainer.querySelector('[data-grid]');
+const $twoTypeDevelopmentCoefficient = $twoTypeContainer.querySelector('[data-development-coefficient]');
+const $twoTypeRating = $twoTypeContainer.querySelector('[data-rating]');
+const $twoTypeScale = $twoTypeContainer.querySelector('[data-scale]');
+const $twoTypeSeasons = $twoTypeContainer.querySelector('[data-seasons]');
 
 // Constants
 const icons = [];
@@ -734,15 +744,15 @@ const typeClassCount = typeClasses.length;
 // Variables
 let animationFrame;
 var deferredPrompt;
-let developmentCoefficient = 32;
-let scale = 400;
-let seasons = 100;
 let oneTypeGrid;
 let twoTypeGrid;
 
 document.addEventListener('DOMContentLoaded', () => {
 	loadIcons();
 	startIcons();
+	runOneTypeElo();
+	// TODO: Make this run on page load. Maybe using service workers?
+	// runTwoTypeElo();
 	registerEventListeners();
 });
 
@@ -851,7 +861,9 @@ function getAngle(dx, dy) {
 }
 
 function startIcons() {
-	animationFrame = window.requestAnimationFrame(generateNextFrame);
+	if (window.scrollY === 0) {
+		animationFrame = window.requestAnimationFrame(generateNextFrame);
+	}
 }
 
 function generateNextFrame() {
@@ -945,26 +957,16 @@ function generateNextFrame() {
 	animationFrame = window.requestAnimationFrame(generateNextFrame);
 }
 
-function runOneTypeELO() {
+function runOneTypeElo() {
+	developmentCoefficient = Number($oneTypeDevelopmentCoefficient.value) || 32;
+	rating = Number($oneTypeRating.value) || 1000;
+	scale = Number($oneTypeScale.value) || 400;
+	seasons = Number($oneTypeSeasons.value) || 100;
+
 	const pokémon = [];
 	for (let type1Index = 0; type1Index < typeClassCount; type1Index++) {
-		pokémon.push(new Pokémon(typeClasses[type1Index]));
+		pokémon.push(new Pokémon(typeClasses[type1Index], undefined, rating, rating));
 	};
-
-	const $developmentCoefficient = document.querySelector('#developmentCoefficient');
-	if ($developmentCoefficient) {
-		developmentCoefficient = $developmentCoefficient.value;
-	}
-
-	const $scale = document.querySelector('#scale');
-	if ($scale) {
-		scale = $scale.value;
-	}
-
-	const $seasons = document.querySelector('#seasons');
-	if ($seasons) {
-		seasons = $seasons.value;
-	}
 
 	for (let i = 0; i < seasons; i++) {
 		shuffle(pokémon);
@@ -973,7 +975,7 @@ function runOneTypeELO() {
 		for (let j = 0; j < pokémon.length; j += 1) {
 			for (let k = 0; k < pokémon.length; k += 1) {
 				if (j < k) {
-					battle(pokémon[j], pokémon[k]);
+					battle(pokémon[j], pokémon[k], developmentCoefficient, scale);
 				}
 			}
 		}
@@ -992,9 +994,13 @@ function runOneTypeELO() {
 	});
 	
 	if (oneTypeGrid) {
-		oneTypeGrid.updateConfig({
-			data: pokémonFormatted
-		  }).forceRender();
+		// https://github.com/grid-js/gridjs/issues/1291#issuecomment-1549489308
+		Promise.resolve(oneTypeGrid.config.plugin.remove("pagination"))
+		.then(() => {
+			oneTypeGrid.updateConfig({
+				data: pokémonFormatted
+			}).forceRender();
+		});
 	} else {
 		oneTypeGrid = new gridjs.Grid({ 
 			columns: [
@@ -1004,50 +1010,43 @@ function runOneTypeELO() {
 				},
 				{
 					id: 'offenseRating',
-					name: 'Offense ELO',
+					name: 'Offense Elo',
 					sort: true,
 				},
 				{
 					id: 'defenseRating',
-					name: 'Defense ELO',
+					name: 'Defense Elo',
 					sort: true,
 				},
 				{
 					id: 'averageRating',
-					name: 'Average ELO',
+					name: 'Average Elo',
 					sort: true,
 				},
 			],
 			data: pokémonFormatted,
+			pagination: {
+				limit: 10
+			},
 			fixedHeader: true,
 		}).render($oneTypeGrid);
 	}
 }
 
-function runTwoTypeELO() {
+function runTwoTypeElo() {
+	developmentCoefficient = Number($twoTypeDevelopmentCoefficient.value) || 32;
+	rating = Number($twoTypeRating.value) || 1000;
+	scale = Number($twoTypeScale.value) || 400;
+	seasons = Number($twoTypeSeasons.value) || 100;
+
 	const pokémon = [];
 	for (let type1Index = 0; type1Index < typeClassCount; type1Index++) {
-		pokémon.push(new Pokémon(typeClasses[type1Index]));
+		pokémon.push(new Pokémon(typeClasses[type1Index], undefined, rating, rating));
 
 		for (let type2Index = type1Index + 1; type2Index < typeClassCount; type2Index++) {
-			pokémon.push(new Pokémon(typeClasses[type1Index], typeClasses[type2Index]));
+			pokémon.push(new Pokémon(typeClasses[type1Index], typeClasses[type2Index], rating, rating));
 		};
 	};
-
-	const $developmentCoefficient = document.querySelector('#developmentCoefficient');
-	if ($developmentCoefficient) {
-		developmentCoefficient = $developmentCoefficient.value;
-	}
-
-	const $scale = document.querySelector('#scale');
-	if ($scale) {
-		scale = $scale.value;
-	}
-
-	const $seasons = document.querySelector('#seasons');
-	if ($seasons) {
-		seasons = $seasons.value;
-	}
 
 	for (let i = 0; i < seasons; i++) {
 		shuffle(pokémon);
@@ -1056,7 +1055,7 @@ function runTwoTypeELO() {
 		for (let j = 0; j < pokémon.length; j += 1) {
 			for (let k = 0; k < pokémon.length; k += 1) {
 				if (j < k) {
-					battle(pokémon[j], pokémon[k]);
+					battle(pokémon[j], pokémon[k], developmentCoefficient, scale);
 				}
 			}
 		}
@@ -1097,17 +1096,17 @@ function runTwoTypeELO() {
 				},
 				{
 					id: 'offenseRating',
-					name: 'Offense ELO',
+					name: 'Offense Elo',
 					sort: true,
 				},
 				{
 					id: 'defenseRating',
-					name: 'Defense ELO',
+					name: 'Defense Elo',
 					sort: true,
 				},
 				{
 					id: 'averageRating',
-					name: 'Average ELO',
+					name: 'Average Elo',
 					sort: true,
 				},
 			],
@@ -1120,7 +1119,7 @@ function runTwoTypeELO() {
 	}
 }
 
-function battle(pokémon1, pokémon2) {
+function battle(pokémon1, pokémon2, developmentCoefficient = 32, scale = 400) {
 	let pokémon1Attack = 1;
 	let pokémon1Defense = 1;
 	let pokémon1Type1Attack = 1;
@@ -1375,22 +1374,21 @@ function shuffle(array) {
 function registerEventListeners() {
 	document.addEventListener("scroll", (event) => {
 		if (window.scrollY > 0) {
-	
 			window.cancelAnimationFrame(animationFrame);
 		} else {
 			animationFrame = window.requestAnimationFrame(generateNextFrame);
 		}
 	});
 
-	if ($runOneTypeELO) {
-		$runOneTypeELO.addEventListener('click', () => {
-			runOneTypeELO();
+	if ($runOneTypeElo) {
+		$runOneTypeElo.addEventListener('click', () => {
+			runOneTypeElo();
 		});
 	}
 
-	if ($runTwoTypeELO) {
-		$runTwoTypeELO.addEventListener('click', () => {
-			runTwoTypeELO();
+	if ($runTwoTypeElo) {
+		$runTwoTypeElo.addEventListener('click', () => {
+			runTwoTypeElo();
 		});
 	}
 	
