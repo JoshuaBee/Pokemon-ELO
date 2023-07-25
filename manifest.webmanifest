@@ -21,7 +21,7 @@
   "screenshots" : [
     {
       "src": "images/screenshots/screenshot1.webp",
-      "sizes": "3360x1670",
+      "sizes": "3360x1726",
       "type": "image/webp",
       "platform": "wide",
       "label": "Homescreen of Pokémon Type Elo"

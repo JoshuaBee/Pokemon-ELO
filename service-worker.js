@@ -1,4 +1,4 @@
-const version = "1.10";
+const version = "1.11";
 const cacheName = "jb-${version}";
 
 self.addEventListener("install", e => {
@@ -42,7 +42,7 @@ self.addEventListener("install", e => {
 				"/images/pokemon/kabutops.png",
 				"/images/pokemon/scyther.png",
 				"/images/pokemon/vulpix.png",
-				// "/images/screenshots/screenshot1.webp",
+				"/images/screenshots/screenshot1.webp",
 				"/scripts/main.js",
 				"/styles/1-settings/color.css",
 				"/styles/2-tools/font.css",
